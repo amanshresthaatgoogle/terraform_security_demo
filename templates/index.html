@@ -3,15 +3,16 @@
 
 
 {% block content %}
-<div class="container">
+<!-- <div class="container"> -->
+  <h1 class="display-1 text-center">Architecture Summary</h1>
 
-<div class="container text-center">
+<div class="mainContent text-center">
+  
     <div class="row">
       <div class="col">
         <div class="row">
-            <label for="text" class="form-label">Available Options</label>
-            <div class="btn-group">
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="terraform_option" onclick="changeOption">
+            <div class="btn-group architecture_options">
+                <button type="button" class="btn btn-secondary dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="false" id="terraform_option" onclick="changeOption">
                   Action
                 </button>
                 <ul class="dropdown-menu">
@@ -23,24 +24,18 @@
         </div>
        
         <div class="row">
-            <label for="text" class="form-label">Architecture Diagram</label>
-            <label for="text" class="form-label">terraform graph | dot -Tsvg > graph.svg</label>
-            <img class = "architecture" id="architecture_1" src="{{ url_for('static', filename='images/graph_1.svg') }}"></img>
-            <img class = "architecture" id="architecture_2" src="{{ url_for('static', filename='images/graph_2.svg') }}"></img>
-            <img class = "architecture" id="architecture_3" src="{{ url_for('static', filename='images/graph_3.svg') }}"></img>
+          <label for="text" class="form-label">Architecture Diagram</label>
+          <code class="code-block">terraform graph | dot -Tsvg > graph.svg</code>
+          <img class = "architecture" id="architecture_1" src="{{ url_for('static', filename='images/graph_1.svg') }}"></img>
+          <img class = "architecture" id="architecture_2" src="{{ url_for('static', filename='images/graph_2.svg') }}"></img>
+          <img class = "architecture" id="architecture_3" src="{{ url_for('static', filename='images/graph_3.svg') }}"></img>
         </div>
         
       </div>
       <div class="col">
         <div class = "container">
             <ul class="messages" id = "messages">
-                <li class="eachMessage">test</li>
-                <li class="eachMessage">test</li>
-                <li class="eachMessage">test</li>
-                <li class="eachMessage">test</li>
-                <li class="eachMessage">test</li>
-                <li class="eachMessage">test</li>
-                <li class="eachMessage">test</li>
+              <li class="eachMessage aiMessage"> Hi! I'm here to help summarize your architecture. Ask me questions like "Summarize this architecture for me", "What are the services being used" and so on </li>
             </ul>
             <div class="mb-3">
                 <div class="row">
@@ -56,7 +51,7 @@
 
       </div>
     </div>
-  </div>
+  <!-- </div> -->
 
 
 

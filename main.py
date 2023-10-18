@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 import vertexai
-from vertexai.preview.language_models import ChatModel, InputOutputTextPair
+from vertexai.preview.language_models import ChatModel, InputOutputTextPair, CodeChatModel
 
 from flask_cors import CORS, cross_origin
 
@@ -343,12 +343,19 @@ resource "google_project_iam_member" "computeViewer" {
 """
 
 vertexai.init(project="test-data-studio-365519", location="us-central1")
-chat_model = ChatModel.from_pretrained("chat-bison-32k")
+# chat_model = ChatModel.from_pretrained("chat-bison-32k")
+# parameters = {
+#     "max_output_tokens": 3697,
+#     "temperature": 0.6,
+#     "top_p": 0.43,
+#     "top_k": 17
+# }
+
+
+chat_model = CodeChatModel.from_pretrained("codechat-bison-32k")
 parameters = {
-    "max_output_tokens": 3697,
-    "temperature": 0.6,
-    "top_p": 0.43,
-    "top_k": 17
+    "max_output_tokens": 5000,
+    "temperature": 0.4
 }
 
 

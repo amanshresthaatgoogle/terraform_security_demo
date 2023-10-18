@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %} Homepage {% endblock %}
+
+
+{% block content %}
+<div class="container">
+
+<div class="container text-center">
+    <div class="row">
+      <div class="col">
+        <div class="row">
+            <label for="text" class="form-label">Available Options</label>
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="terraform_option" onclick="changeOption">
+                  Action
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" onclick="changeOption('Terraform 1')">Terraform 1</a></li>
+                  <li><a class="dropdown-item" onclick="changeOption('Terraform 2')">Terraform 2</a></li>
+                  <!-- <li><a class="dropdown-item" onclick="changeOption('Terraform 3')">Terraform 3</a></li> -->
+                </ul>
+              </div>
+        </div>
+       
+        <div class="row">
+            <label for="text" class="form-label">Architecture Diagram</label>
+            <label for="text" class="form-label">terraform graph | dot -Tsvg > graph.svg</label>
+            <img class = "architecture" id="architecture_1" src="{{ url_for('static', filename='images/graph_1.svg') }}"></img>
+            <img class = "architecture" id="architecture_2" src="{{ url_for('static', filename='images/graph_2.svg') }}"></img>
+            <img class = "architecture" id="architecture_3" src="{{ url_for('static', filename='images/graph_3.svg') }}"></img>
+        </div>
+        
+      </div>
+      <div class="col">
+        <div class = "container">
+            <ul class="messages" id = "messages">
+                <li class="eachMessage">test</li>
+                <li class="eachMessage">test</li>
+                <li class="eachMessage">test</li>
+                <li class="eachMessage">test</li>
+                <li class="eachMessage">test</li>
+                <li class="eachMessage">test</li>
+                <li class="eachMessage">test</li>
+            </ul>
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-10">
+                        <input class="form-control" id="questionBox">
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-primary" onclick="submitQuestion()">Submit</button>
+                    </div>
+                
+            </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+
+</div>
+
+{% endblock %}

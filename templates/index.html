@@ -1,66 +1,125 @@
 {% extends "base.html" %}
-{% block title %} Homepage {% endblock %}
-
+{% block title %}Terraform Analyzer{% endblock %}
 
 {% block content %}
-<!-- <div class="container"> -->
-  <h1 class="display-1 text-center">Architecture Summary</h1>
 
-<div class="mainContent text-center">
-  
+<div class="container mt-5">
     <div class="row">
-      <div class="col">
-        <div class="row">
-            <div class="btn-group architecture_options">
-                <button type="button" class="btn btn-secondary dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="false" id="terraform_option" onclick="changeOption">
-                  Action
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" onclick="changeOption('Terraform 1')">Terraform 1</a></li>
-                  <li><a class="dropdown-item" onclick="changeOption('Terraform 2')">Terraform 2</a></li>
-                  <!-- <li><a class="dropdown-item" onclick="changeOption('Terraform 3')">Terraform 3</a></li> -->
-                </ul>
-              </div>
-        </div>
-       
-        <div class="row">
-          <label for="text" class="form-label">Architecture Diagram</label>
-          <code class="code-block">terraform graph | dot -Tsvg > graph.svg</code>
-          <img class = "architecture" id="architecture_1" src="{{ url_for('static', filename='images/graph_1.svg') }}"></img>
-          <img class = "architecture" id="architecture_2" src="{{ url_for('static', filename='images/graph_2.svg') }}"></img>
-          <img class = "architecture" id="architecture_3" src="{{ url_for('static', filename='images/graph_3.svg') }}"></img>
-        </div>
-        <div class="row">
-          <code id="terraform_code">
-
-          </code>
-        </div>
-        
-      </div>
-      <div class="col">
-        <div class = "container">
-            <ul class="messages" id = "messages">
-              <li class="eachMessage aiMessage"> Hi! I'm here to help summarize your architecture. Ask me questions like "Summarize this architecture for me", "What are the services being used" and so on </li>
-            </ul>
-            <div class="mb-3">
-                <div class="row">
-                    <div class="col-10">
-                        <input class="form-control" id="questionBox">
+        <div class="col-md-5"> 
+            <div class="card h-100 shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3>Upload Terraform Code</h3>
+                </div>
+                <div class="card-body"  style="max-height: 800px; overflow-y: auto;">
+                    <div class="row mb-3">
+                        <input type="file" id="fileInput" class="form-control">
+                        <button class="btn btn-success mt-2" onclick="loadFile()">Load</button>
                     </div>
-                    <div class="col-2">
-                        <button class="btn btn-primary" onclick="submitQuestion()">Submit</button>
-                    </div>
-                
+                    <pre><code class="language-terraform" id="terraform_code">
+# Terraform code will appear here after loading
+                    </code></pre>
+                </div>
             </div>
         </div>
-
-      </div>
+        <div class="col-md-7"> 
+            <div class="card h-100 shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h3>Chat with Terraform Expert</h3>
+                </div>
+                <div class="card-body" style="max-height: 800px; overflow-y: auto;">
+                    <ul class="messages" id="messages">
+                        <li class="eachMessage aiMessage">Hi! I'm your Terraform assistant. Upload your code to get started.</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input class="form-control" id="questionBox" placeholder="Ask me anything about your Terraform..." onkeydown="handleKeyDown(event)">
+                        <button class="btn btn-primary" onclick="submitQuestion()">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  <!-- </div> -->
-
-
-
-
 </div>
 
+
+<script>
+    let messageHistory = []; 
+
+    function loadFile() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            document.getElementById('terraform_code').innerText = event.target.result;
+            messageHistory = [];
+            messageHistory.push(event.target.result);
+        };
+
+        if (file) {
+            reader.readAsText(file);
+        }
+    }
+
+    function handleKeyDown(event) {
+        if (event.keyCode === 13 && !event.shiftKey) { // Enter key without Shift
+            event.preventDefault(); // Prevent default new line behavior
+            submitQuestion();
+        }
+    }
+
+    function submitQuestion() {
+        const question = document.getElementById('questionBox').value;
+        const terraformCode = document.getElementById('terraform_code').innerText;
+        const messagesContainer = document.getElementById('messages');
+
+        messageHistory.push(question);
+
+        const userMessage = document.createElement('li');
+        userMessage.classList.add('eachMessage', 'userMessage');
+        userMessage.innerText = question;
+        messagesContainer.appendChild(userMessage);
+
+        document.getElementById('questionBox').value = '';
+
+        // Add loading indicator
+        const loadingMessage = document.createElement('li');
+        loadingMessage.classList.add('eachMessage', 'aiMessage');
+        loadingMessage.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>'; // Bootstrap spinner
+        messagesContainer.appendChild(loadingMessage); 
+
+        fetch('/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: messageHistory, terraform_code: terraformCode })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Remove loading indicator
+            loadingMessage.remove();
+
+            if (data.response) {
+                messageHistory.push(data.response);
+
+                const aiMessage = document.createElement('li');
+                aiMessage.classList.add('eachMessage', 'aiMessage');
+                aiMessage.innerHTML = marked.parse(data.response);                
+                messagesContainer.appendChild(aiMessage);
+            } else {
+                console.log("Error occured")
+            }
+        })
+        .catch(error => {
+            console.log("Error occured")
+            console.log(error)
+        });
+    }
+</script>
+
+
 {% endblock %}
+
+
+
+

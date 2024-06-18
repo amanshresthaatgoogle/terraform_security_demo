@@ -13,7 +13,6 @@ messages = [
         'message' : 'Hi there'
     }
 ]
-
 document.addEventListener("DOMContentLoaded",  
 function () { 
 
@@ -23,9 +22,11 @@ function () {
     const architecture_1 = document.querySelector('#architecture_1');
     const architecture_2 = document.querySelector('#architecture_2');
     const architecture_3 = document.querySelector('#architecture_3');
+    const architecture_4 = document.querySelector('#architecture_4');
     architecture_1.style.width = '80%';
     architecture_2.style.height = 0;
     architecture_3.style.height = 0;
+    architecture_4.style.height = 0;
 
     const terraform_code = document.querySelector('#terraform_code');
     terraform_code.innerHTML=terraform_code_1
@@ -37,6 +38,7 @@ function () {
             question = e.target.value;
         }
     });
+
 
 }); 
 
@@ -51,7 +53,6 @@ function updateChat(newMessage,sender){
     }else{
         li.classList.add('aiMessage')
     }
-    
     li.appendChild(document.createTextNode(newMessage));
     listOfMessage.appendChild(li);
 
@@ -64,14 +65,18 @@ function updateChat(newMessage,sender){
 
 function changeOption(value) {
     valueSelected = value
+    console.log("It's here")
+    console.log(valueSelected)
     document.querySelector('#terraform_option').innerText = valueSelected;
 
     const architecture_1 = document.querySelector('#architecture_1');
     const architecture_2 = document.querySelector('#architecture_2');
     const architecture_3 = document.querySelector('#architecture_3');
+    const architecture_4 = document.querySelector('#architecture_4');
     architecture_1.style.height = 0;
     architecture_2.style.height = 0;
     architecture_3.style.height = 0;
+    architecture_4.style.height = 0;
 
     const terraform_code = document.querySelector('#terraform_code');
     if(valueSelected === "Terraform 1"){
@@ -84,9 +89,13 @@ function changeOption(value) {
         architecture_2.style.height = '80%';
         terraform_code.innerHTML=terraform_code_2
 
-    }else{
+    }else if(valueSelected ==="Terraform 3"){
         // architecture_3.style.visibility = "visible";
         architecture_3.style.height = '80%';
+        terraform_code.innerHTML=terraform_code_3
+    }else{
+      architecture_4.style.height = '80%';
+      terraform_code.innerHTML=terraform_code_4
     }
 }
 
@@ -95,7 +104,6 @@ async function submitQuestion() {
     console.log('Make post request')
     updateChat(question, "user")
    
-
     var input = document.getElementById("questionBox");
     
 
@@ -452,4 +460,90 @@ resource "google_project_iam_member" "computeViewer" { <br>
   role    = google_project_iam_custom_role.instanceLister.id <br>
   member  = "group:{local.minecraft_switch_access_group}" <br>
 } <br>
+`
+
+const terraform_code_3 = `
+
+# [START iam_create_deny_policy]
+data "google_project" "default" { <br>
+} <br>
+<br>
+# Create a service account <br>
+resource "google_service_account" "default" { <br>
+  display_name = "IAM Deny Example - Service Account" <br>
+  account_id   = "example-sa" <br>
+  project      = data.google_project.default.project_id <br>
+} <br>
+<br>
+# Create an IAM deny policy that denies a permission for the service account <br>
+resource "google_iam_deny_policy" "default" { <br>
+  provider     = google-beta <br>
+  parent       = urlencode("cloudresourcemanager.googleapis.com/projects/{data.google_project.default.project_id}") <br>
+  name         = "my-deny-policy" <br>
+  display_name = "My deny policy." <br>
+  rules { <br>
+    deny_rule { <br>
+      denied_principals  = ["principal://iam.googleapis.com/projects/-/serviceAccounts/{google_service_account.default.email}"] <br>
+      denied_permissions = ["iam.googleapis.com/roles.create"] <br>
+    } <br>
+  } <br>
+} <br>
+# [END iam_create_deny_policy] 
+
+`
+
+const terraform_code_4=`
+# [START cloud_sql_mysql_instance_ha] <br>
+resource "google_sql_database_instance" "mysql_instance_ha" { <br>
+  name             = "mysql-instance-ha" <br>
+  region           = "asia-northeast1" <br>
+  database_version = "MYSQL_8_0" <br>
+  settings { <br>
+    tier              = "db-f1-micro" <br>
+    availability_type = "REGIONAL" <br>
+    backup_configuration { <br>
+      enabled            = true <br>
+      binary_log_enabled = true <br>
+      start_time         = "20:55" <br>
+    } <br>
+  } <br>
+  deletion_protection = false <br>
+} <br>
+# [END cloud_sql_mysql_instance_ha] <br>
+
+# [START cloud_sql_postgres_instance_ha] <br>
+resource "google_sql_database_instance" "postgres_instance_ha" { <br>
+  name             = "postgres-instance-ha" <br>
+  region           = "us-central1" <br>
+  database_version = "POSTGRES_14" <br>
+  settings { <br>
+    tier              = "db-custom-2-7680" <br>
+    availability_type = "REGIONAL" <br>
+    backup_configuration { <br>
+      enabled                        = true <br>
+      point_in_time_recovery_enabled = true <br>
+      start_time                     = "20:55" <br>
+    } <br>
+  } <br>
+  deletion_protection = false <br>
+} <br>
+# [END cloud_sql_postgres_instance_ha] <br>
+
+# [START cloud_sql_sqlserver_instance_ha] <br>
+resource "google_sql_database_instance" "default" { <br>
+  name             = "sqlserver-instance-ha" <br>
+  region           = "us-central1" <br>
+  database_version = "SQLSERVER_2019_STANDARD" <br>
+  root_password    = "INSERT-PASSWORD-HERE" <br>
+  settings { <br>
+    tier              = "db-custom-2-7680" <br>
+    availability_type = "REGIONAL" <br>
+    backup_configuration { <br>
+      enabled    = true <br>
+      start_time = "20:55" <br>
+    } <br>
+  } <br>
+  deletion_protection = false <br>
+} <br>
+# [END cloud_sql_sqlserver_instance_ha] <br>
 `
